@@ -44,7 +44,7 @@ const extensionsPlugin: FastifyPluginAsync = async (fastify) => {
       if (!extensions) return data;
 
       return extensions.reduce((acc, extension) => {
-        acc.payload = extension.transformPayload({ query: request.query, resource: acc });
+        acc.payload = extension.transformPayload({ query: request.query, resource: acc, collection });
         return acc;
       }, data);
     }
@@ -59,7 +59,7 @@ const extensionsPlugin: FastifyPluginAsync = async (fastify) => {
 
       return data.map((resource) => {
         return extensions.reduce((acc, extension) => {
-          acc.payload = extension.transformPayload({ query: request.query, resource: acc });
+          acc.payload = extension.transformPayload({ query: request.query, resource: acc, collection });
           return acc;
         }, resource);
       });
