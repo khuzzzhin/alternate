@@ -37,32 +37,6 @@ describe('Resource service', () => {
     expect(resource).toMatchObject(newResource);
   });
 
-  test('Read one resource with populated payload property', async ({
-    collectionFactory,
-    resourceFactory,
-    resourceService,
-    oneCollection,
-  }) => {
-    const resource = await resourceFactory.createResource(oneCollection);
-    const newCollection = await collectionFactory.createCollection();
-
-    // Create new resource in new collection with a reference to other existing resource
-    const { id: newResourceId } = await resourceService.createResource({
-      collectionId: newCollection.id,
-      payload: { resourceIdToPopulate: resource.id },
-    });
-
-    // Read created resource by id
-    const newResource = await resourceService.readResource({
-      resourceId: newResourceId,
-      populate: ['resourceIdToPopulate'],
-    });
-
-    expect(newResource).toMatchObject({
-      payload: { resourceIdToPopulate: resource },
-    });
-  });
-
   test('Read one resource including its objects', async ({ resourceService, oneObject }) => {
     const resource = await resourceService.readResource({
       resourceId: oneObject.resourceId,

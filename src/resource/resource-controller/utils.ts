@@ -1,6 +1,4 @@
-import type { ResourceFindManyAndPopulateParams } from '../../database/types.js';
-
-type ResourceWhereInput = ResourceFindManyAndPopulateParams['where'];
+import type { ResourceWhereInput } from '../../database/types.js';
 
 /**
  * A lightweight runtime check to verify if an unknown value could be a valid `ResourceWhereInput`.

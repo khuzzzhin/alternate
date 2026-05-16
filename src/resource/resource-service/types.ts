@@ -2,18 +2,19 @@ import type {
   Resource as DatabaseResource,
   ResourceWithObjects as DatabaseResourceWithObjects,
   ResourceWithOutgoingRelations as DatabaseResourceWithOutgoingRelations,
-  ResourceFindManyAndPopulateParams,
+  ResourceWhereInput,
 } from '../../database/types.js';
 import type { Object } from '../../storage/object-service/types.js';
 
 interface ResourceReadParams {
   resourceId: Resource['id'];
-  populate?: string[];
   include?: { objects: boolean };
   relations?: string[];
 }
 
-interface ResourceListReadParams extends ResourceFindManyAndPopulateParams {
+interface ResourceListReadParams {
+  collectionId: string;
+  where?: ResourceWhereInput;
   include?: { objects: boolean };
   relations?: string[];
 }

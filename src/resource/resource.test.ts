@@ -1,8 +1,6 @@
-import { faker } from '@faker-js/faker';
 import type { Resource } from '@prisma/client';
 import { describe, expect } from 'vitest';
 import { test } from '../tests';
-import { serializeResource } from '../tests/utils';
 
 describe('Resource reading', () => {
   test('Cannot read list of resources with no collection id', async ({ server }) => {
@@ -159,80 +157,6 @@ describe('Resource creating/updating', () => {
         expect(response.statusCode).toBe(400);
       });
     }
-  });
-});
-
-describe('Reading resources with other related resources in payload', async () => {
-  test('Should populate related resources in response by `populate` query parameter', async ({
-    server,
-    oneProject,
-  }) => {
-    const authorCollection = await server.database.collection.create({
-      data: { projectId: oneProject.id, name: 'Authors' },
-    });
-    const bookCollection = await server.database.collection.create({
-      data: { projectId: oneProject.id, name: 'Books' },
-    });
-    const genreCollection = await server.database.collection.create({
-      data: { projectId: oneProject.id, name: 'Genres' },
-    });
-
-    const authorResource = await server.database.resource.create({
-      data: {
-        collectionId: authorCollection.id,
-        payload: {
-          firstName: faker.person.firstName(),
-          lastName: faker.person.lastName(),
-          bio: faker.person.bio(),
-        },
-      },
-    });
-
-    const genreResource = await server.database.resource.create({
-      data: {
-        collectionId: genreCollection.id,
-        payload: {
-          name: faker.book.genre(),
-          description: faker.lorem.paragraph(),
-        },
-      },
-    });
-
-    const bookResource = await server.database.resource.create({
-      data: {
-        collectionId: bookCollection.id,
-        payload: {
-          title: faker.book.title(),
-          format: faker.book.format(),
-          publisher: faker.book.publisher(),
-
-          author: authorResource.id,
-          genre: genreResource.id,
-        },
-      },
-    });
-
-    const response = await server.inject({
-      url: `/resource`,
-      method: 'GET',
-      query: {
-        collectionId: bookCollection.id,
-        populate: ['author', 'genre'].join(','),
-      },
-    });
-
-    const parsedBookResource: Resource = JSON.parse(response.body)[0];
-    const serializedAuthorResource = serializeResource(authorResource);
-    const serializedGenreResource = serializeResource(genreResource);
-
-    expect(response.statusCode, response.payload).toBe(200);
-    expect(parsedBookResource.payload).toHaveProperty('author');
-    expect(parsedBookResource.payload).toHaveProperty('genre');
-    expect(parsedBookResource.payload).toEqual({
-      ...bookResource.payload,
-      author: serializedAuthorResource,
-      genre: serializedGenreResource,
-    });
   });
 });
 

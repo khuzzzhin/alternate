@@ -2,8 +2,6 @@ import { Ajv } from 'ajv';
 import addFormats from 'ajv-formats';
 import type { FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
-import { validate as validateGuid } from 'uuid';
-import type { Resource as DatabaseResource } from '../../database/types.js';
 import { objectService } from '../../storage/object-service/index.js';
 
 import { AJV_OPTIONS } from './constants.js';
@@ -58,35 +56,12 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       },
     });
 
-    if (params.populate?.length) {
-      const resourceIdsToPopulate = params.populate
-        .map((key) => resource.payload[key])
-        .filter(validateGuid) as unknown as string[];
-
-      const resources = await fastify.database.resource.findMany({
-        where: { id: { in: resourceIdsToPopulate } },
-      });
-
-      const resourcesMap = resources.reduce<Record<DatabaseResource['id'], DatabaseResource>>((acc, resource) => {
-        acc[resource.id] = resource;
-        return acc;
-      }, {});
-
-      params.populate.forEach((key) => {
-        const value = resource.payload[key];
-
-        resource.payload[key] = resourcesMap[String(value)] || value;
-      });
-    }
-
     return await transformResource({ resource });
   };
 
   const readResourceList: ResourceService['readResourceList'] = async (params) => {
-    const resources = await fastify.database.resource.findManyAndPopulate({
-      collectionId: params.collectionId,
-      where: params.where,
-      populate: params.populate,
+    const resources = await fastify.database.resource.findMany({
+      where: { ...params.where, collectionId: params.collectionId },
       include: {
         objects: params.include?.objects,
         outgoingRelations: params.relations ? getResourceOutgoingRelationsArgs(params.relations) : false,

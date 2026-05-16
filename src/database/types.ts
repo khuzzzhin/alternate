@@ -1,13 +1,6 @@
 import type { Object as BaseObject, Collection, Prisma, Resource } from '@prisma/client';
 import type { createExtendedPrismaClient } from './utils.js';
 
-export interface ResourceFindManyAndPopulateParams {
-  collectionId: string;
-  populate?: string[];
-  where?: Omit<Prisma.ResourceWhereInput, 'collection' | 'collectionId'>;
-  include?: Pick<Prisma.ResourceInclude, 'objects' | 'outgoingRelations' | 'collection'>;
-}
-
 export type PrismaClientExtended = ReturnType<typeof createExtendedPrismaClient>;
 
 export type { Collection, Resource };
@@ -15,6 +8,8 @@ export type { Collection, Resource };
 export interface Object extends BaseObject {
   name: string;
 }
+
+export type ResourceWhereInput = Prisma.ResourceWhereInput;
 
 export interface ResourceWithObjects extends Resource {
   objects: Object[];
