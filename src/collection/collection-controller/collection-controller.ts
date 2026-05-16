@@ -1,16 +1,14 @@
 import type { FastifyPluginAsync } from 'fastify';
 import {
+  type CollectionCreateSchema,
+  type CollectionListReadSchema,
+  type CollectionReadSchema,
+  type CollectionUpdateSchema,
   collectionCreateSchema,
   collectionListReadSchema,
   collectionReadSchema,
   collectionUpdateSchema,
 } from './schema.js';
-import type {
-  CollectionCreateSchema,
-  CollectionListReadSchema,
-  CollectionReadSchema,
-  CollectionUpdateSchema,
-} from './types.js';
 
 export const collectionController: FastifyPluginAsync = async (fastify) => {
   fastify.route<CollectionReadSchema>({

@@ -2,14 +2,17 @@ import type { FastifyPluginAsync } from 'fastify';
 import qs from 'qs';
 import { INVALID_WHERE_PARAMETER_MESSAGE } from './const.js';
 import { extensionsPlugin } from './extensions/index.js';
-import { resourceCreateSchema, resourceListReadSchema, resourceReadSchema, resourceUpdateSchema } from './schema.js';
-import type {
-  ResourceControllerOptions,
-  ResourceCreateSchema,
-  ResourceListReadSchema,
-  ResourceReadSchema,
-  ResourceUpdateSchema,
-} from './types.js';
+import {
+  type ResourceCreateSchema,
+  type ResourceListReadSchema,
+  type ResourceReadSchema,
+  type ResourceUpdateSchema,
+  resourceCreateSchema,
+  resourceListReadSchema,
+  resourceReadSchema,
+  resourceUpdateSchema,
+} from './schema.js';
+import type { ResourceControllerOptions } from './types.js';
 import { isValidResourceWhereInput } from './utils.js';
 
 export const resourceController: FastifyPluginAsync<ResourceControllerOptions> = async (fastify, options) => {

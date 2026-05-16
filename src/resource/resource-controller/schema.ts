@@ -1,4 +1,4 @@
-import { Type as T } from '@sinclair/typebox';
+import { type Static, Type as T } from '@sinclair/typebox';
 
 export const resourceReadSchema = {
   params: T.Object({
@@ -10,6 +10,11 @@ export const resourceReadSchema = {
   }),
 };
 
+export type ResourceReadSchema = {
+  Params: Static<(typeof resourceReadSchema)['params']>;
+  Querystring: Static<(typeof resourceReadSchema)['querystring']>;
+};
+
 export const resourceListReadSchema = {
   querystring: T.Object({
     collectionId: T.String({ minLength: 1 }),
@@ -18,11 +23,19 @@ export const resourceListReadSchema = {
   }),
 };
 
+export type ResourceListReadSchema = {
+  Querystring: Static<(typeof resourceListReadSchema)['querystring']>;
+};
+
 export const resourceCreateSchema = {
   body: T.Object({
     collectionId: T.String({ minLength: 1 }),
     payload: T.Object({}),
   }),
+};
+
+export type ResourceCreateSchema = {
+  Body: Static<(typeof resourceCreateSchema)['body']>;
 };
 
 export const resourceUpdateSchema = {
@@ -35,4 +48,9 @@ export const resourceUpdateSchema = {
     },
     { additionalProperties: false },
   ),
+};
+
+export type ResourceUpdateSchema = {
+  Params: Static<(typeof resourceUpdateSchema)['params']>;
+  Body: Static<(typeof resourceUpdateSchema)['body']>;
 };
