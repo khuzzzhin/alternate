@@ -1,5 +1,5 @@
 import { describe, expect } from 'vitest';
-import { test } from './tests';
+import { test } from '../tests';
 
 describe('Authentication', () => {
   test('Sign up using email and password', async ({ server }) => {

@@ -4,7 +4,7 @@ import { fromNodeHeaders } from 'better-auth/node';
 import type { FastifyPluginAsync } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
-const authPlugin: FastifyPluginAsync = async (fastify) => {
+const authentication: FastifyPluginAsync = async (fastify) => {
   const auth = betterAuth({
     database: prismaAdapter(fastify.database, { provider: 'postgresql' }),
     emailAndPassword: { enabled: true },
@@ -53,4 +53,4 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-export default fastifyPlugin(authPlugin);
+export default fastifyPlugin(authentication);

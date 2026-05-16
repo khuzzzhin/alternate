@@ -1,6 +1,6 @@
 import cors from '@fastify/cors';
 import Fastify, { type FastifyServerOptions } from 'fastify';
-import authPlugin from './auth.js';
+import { authentication } from './authentication/index.js';
 import { collection } from './collection/index.js';
 import database from './database/index.js';
 import { minio } from './minio/index.js';
@@ -34,7 +34,7 @@ export const buildServer = (options: Options) => {
   });
 
   fastifyServer.register(database);
-  fastifyServer.register(authPlugin);
+  fastifyServer.register(authentication);
   fastifyServer.register(minio, minioOptions);
 
   fastifyServer.register(project);
