@@ -1,19 +1,28 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { fromNodeHeaders } from 'better-auth/node';
+import { admin } from 'better-auth/plugins/admin';
 import type { FastifyPluginAsync } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
+import { ACCESS_CONTROL, ROLES } from './constants.js';
 
-const authentication: FastifyPluginAsync = async (fastify) => {
-  const auth = betterAuth({
-    database: prismaAdapter(fastify.database, { provider: 'postgresql' }),
+export type AuthInstance = ReturnType<typeof createAuthInstance>;
+
+const createAuthInstance = (prisma: Parameters<typeof prismaAdapter>[0]) => {
+  return betterAuth({
+    database: prismaAdapter(prisma, { provider: 'postgresql' }),
     emailAndPassword: { enabled: true },
     trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(','),
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL,
     basePath: '/auth',
     advanced: { useSecureCookies: process.env.BETTER_AUTH_USE_SECURE_COOKIES === 'false' ? false : undefined },
+    plugins: [admin({ ac: ACCESS_CONTROL, roles: ROLES })],
   });
+};
+
+const authentication: FastifyPluginAsync = async (fastify) => {
+  const auth = createAuthInstance(fastify.database);
 
   fastify.route({
     method: ['GET', 'POST'],
@@ -51,6 +60,15 @@ const authentication: FastifyPluginAsync = async (fastify) => {
       }
     },
   });
+
+  fastify.addHook('onRequest', async (request) => {
+    request.session = await fastify.auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    });
+  });
+
+  fastify.decorate<typeof auth>('auth', auth);
+  fastify.decorateRequest('session', null);
 };
 
 export default fastifyPlugin(authentication);

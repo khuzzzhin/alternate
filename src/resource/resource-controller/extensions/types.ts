@@ -12,6 +12,9 @@ interface PayloadTransformParams {
   collection: Collection;
 }
 
+/**
+ * @TODO Try the same interface as better-auth plugins
+ */
 export interface Extension {
   name: string;
   version: string;

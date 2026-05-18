@@ -19,12 +19,25 @@ describe('Authentication', () => {
 
     expect(response.statusCode).toBe(200);
     expect(responseBody).toHaveProperty('user');
-    expect(responseBody.user).toMatchObject({
-      name: newUserData.name,
-      email: newUserData.email,
-    });
+    expect(responseBody.user).toMatchObject({ name: newUserData.name, email: newUserData.email });
   });
 
   test.todo('Sign in');
   test.todo('Sign out');
+
+  describe('Admin plugin', () => {
+    test('User role settings', async ({ server }) => {
+      const plugins = server.auth.options.plugins;
+
+      const adminPlugin = plugins?.find((p) => p.id === 'admin');
+
+      expect(adminPlugin).toBeDefined();
+
+      const roles = adminPlugin?.options?.roles;
+
+      expect(roles).toBeDefined();
+      expect(roles).toHaveProperty('admin');
+      expect(roles).toHaveProperty('user');
+    });
+  });
 });
