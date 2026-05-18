@@ -217,4 +217,45 @@ export const test = testBase.extend<Fixtures>({
 
     await use({ createObject });
   },
+
+  authFactory: async ({ server }, use) => {
+    const createUserWithRole = async (role: 'user' | 'admin') => {
+      const credentials = {
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      };
+
+      const { user } = await server.auth.api.createUser({
+        body: {
+          ...credentials,
+          name: faker.internet.username(),
+          role: role,
+        },
+      });
+
+      return { user, credentials };
+    };
+
+    const signIn: Fixtures['authFactory']['signIn'] = async (credentials) => {
+      const { headers } = await server.auth.api.signInEmail({
+        body: credentials,
+        returnHeaders: true,
+      });
+
+      return { Cookie: headers.getSetCookie().at(0) };
+    };
+
+    const inject: Fixtures['authFactory']['inject'] = async (options) => {
+      const credentials =
+        'userCredentials' in options
+          ? options.userCredentials
+          : (await createUserWithRole(options.userRole)).credentials;
+
+      const authHeaders = await signIn(credentials);
+
+      return await server.inject({ ...options, headers: { ...options.headers, ...authHeaders } });
+    };
+
+    await use({ createUserWithRole, signIn, inject });
+  },
 });

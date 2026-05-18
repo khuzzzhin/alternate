@@ -1,5 +1,6 @@
 import type { Collection, Prisma, Project, Resource } from '@prisma/client';
-import type { FastifyInstance } from 'fastify';
+import type { UserWithRole } from 'better-auth/plugins/admin';
+import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from 'fastify';
 import type { Client as MinioClient } from 'minio';
 import type { Object } from '../database/types.js';
 
@@ -7,6 +8,13 @@ interface File {
   name: string;
   content: Blob | string;
 }
+
+interface UserCredentials {
+  email: string;
+  password: string;
+}
+
+type InjectWithUserOptions = InjectOptions & ({ userRole: 'user' | 'admin' } | { userCredentials: UserCredentials });
 
 export interface Fixtures {
   server: FastifyInstance;
@@ -49,5 +57,30 @@ export interface Fixtures {
      * @returns The created object
      */
     createObject: (resource: Resource) => Promise<Object>;
+  };
+
+  authFactory: {
+    /**
+     * Creates a new user with the specified role
+     * @param role - The role to assign to the user ('user' or 'admin')
+     * @returns The created user object and their credentials
+     */
+    createUserWithRole: (role: 'user' | 'admin') => Promise<{ user: UserWithRole; credentials: UserCredentials }>;
+
+    /**
+     * Signs in a user and returns authentication headers
+     * @param userCredentials - The user's email and password
+     * @returns Authentication headers containing cookie/session data
+     */
+    signIn: (userCredentials: UserCredentials) => Promise<{ Cookie: string | undefined }>;
+
+    /**
+     * The same as `server.inject`, but allows to provide user credentials
+     * that will be used to authenticate and make a request. Instead of credentials
+     * user role can be provided to create a new user before proceeding to authentication.
+     *
+     * @TODO User creation/authentication on every request is slow.
+     */
+    inject: (options: InjectWithUserOptions) => Promise<LightMyRequestResponse>;
   };
 }

@@ -20,9 +20,18 @@ export const projectController: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.route<ProjectReadSchema>({
-    url: '/project/:id',
     method: 'GET',
+    url: '/project/:id',
     schema: projectReadSchema,
+    onRequest: async (request, reply) => {
+      const canReadProjects = request.session?.user.role === 'admin';
+
+      if (!canReadProjects) {
+        return reply
+          .code(403)
+          .send({ code: 'NOT_ALLOWED_TO_READ_PROJECTS', message: 'You are not allowed to read projects' });
+      }
+    },
     handler: async (request) => {
       return await fastify.database.project.findUniqueOrThrow({
         where: { id: request.params.id },
@@ -31,17 +40,35 @@ export const projectController: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.route({
-    url: '/project',
     method: 'GET',
+    url: '/project',
+    onRequest: async (request, reply) => {
+      const canReadProjects = request.session?.user.role === 'admin';
+
+      if (!canReadProjects) {
+        return reply
+          .code(403)
+          .send({ code: 'NOT_ALLOWED_TO_READ_PROJECTS', message: 'You are not allowed to read projects' });
+      }
+    },
     handler: async () => {
       return await fastify.database.project.findMany();
     },
   });
 
   fastify.route<ProjectCreateSchema>({
-    url: '/project',
     method: 'POST',
+    url: '/project',
     schema: projectCreateSchema,
+    onRequest: async (request, reply) => {
+      const canCreateProject = request.session?.user.role === 'admin';
+
+      if (!canCreateProject) {
+        return reply
+          .code(403)
+          .send({ code: 'NOT_ALLOWED_TO_CREATE_PROJECTS', message: 'You are not allowed to create projects' });
+      }
+    },
     handler: async (request, reply) => {
       const createdProject = await fastify.database.project.create({
         data: { name: request.body.name },
