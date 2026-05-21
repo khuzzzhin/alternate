@@ -4,6 +4,10 @@ import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from 'fas
 import type { Client as MinioClient } from 'minio';
 import type { Object } from '../database/types.js';
 
+interface TestUtils {
+  inspect: (object: unknown, showHidden?: boolean, depth?: number) => void;
+}
+
 interface File {
   name: string;
   content: Blob | string;
@@ -83,4 +87,6 @@ export interface Fixtures {
      */
     inject: (options: InjectWithUserOptions) => Promise<LightMyRequestResponse>;
   };
+
+  utils: TestUtils;
 }

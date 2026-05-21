@@ -5,11 +5,11 @@
  * @see https://vitest.dev/guide/improving-performance
  */
 
+import { inspect as nodeInspect } from 'node:util';
 import { faker } from '@faker-js/faker';
 import type { FastifyInstance } from 'fastify';
 import { Client as MinioClient } from 'minio';
 import { inject, test as testBase } from 'vitest';
-
 import { buildServer } from '../build-server.js';
 import type { Fixtures } from './types.js';
 
@@ -257,5 +257,13 @@ export const test = testBase.extend<Fixtures>({
     };
 
     await use({ createUserWithRole, signIn, inject });
+  },
+
+  utils: async ({}, use) => {
+    const inspect = (object: unknown, showHidden = true, depth = 16) => {
+      return console.info(nodeInspect(object, showHidden, depth));
+    };
+
+    use({ inspect });
   },
 });
