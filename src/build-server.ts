@@ -2,7 +2,7 @@ import cors from '@fastify/cors';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 import { authentication } from './authentication/index.js';
 import { collection } from './collection/index.js';
-import database from './database/index.js';
+import { type DatabaseOptions, database } from './database/index.js';
 import { minio } from './minio/index.js';
 import { project } from './project/index.js';
 import { resource } from './resource/index.js';
@@ -10,6 +10,7 @@ import { storage } from './storage/index.js';
 
 interface Options {
   serverOptions?: FastifyServerOptions;
+  databaseOptions: DatabaseOptions;
   minioOptions: {
     host: string;
     port: number;
@@ -21,7 +22,7 @@ interface Options {
 }
 
 export const buildServer = (options: Options) => {
-  const { serverOptions, minioOptions } = options;
+  const { serverOptions, databaseOptions, minioOptions } = options;
 
   const fastifyServer = Fastify(serverOptions);
 
@@ -33,7 +34,7 @@ export const buildServer = (options: Options) => {
     maxAge: 86400,
   });
 
-  fastifyServer.register(database);
+  fastifyServer.register(database, databaseOptions);
   fastifyServer.register(authentication);
   fastifyServer.register(minio, minioOptions);
 

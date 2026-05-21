@@ -5,6 +5,8 @@ declare module 'vitest' {
     MINIO_ACCESS_KEY: string;
     MINIO_SECRET_KEY: string;
     MINIO_BUCKET_NAME: string;
+
+    DATABASE_URL: string;
   }
 }
 

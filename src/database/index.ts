@@ -6,4 +6,5 @@ declare module 'fastify' {
   }
 }
 
-export { default } from './database.js';
+export { default as database } from './database.js';
+export type { DatabaseOptions } from './types.js';

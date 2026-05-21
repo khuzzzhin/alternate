@@ -1,34 +1,33 @@
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
+import type { TestProject } from 'vitest/node';
 
-async function runMigrations() {
-  const command = `prisma db push --skip-generate`;
-  const promisifiedExec = promisify(exec);
-  const result = await promisifiedExec(command);
+async function runMigrations(url: string) {
+  const command = `export DATABASE_URL="${url}" && prisma db push --skip-generate`;
+  const result = await promisify(exec)(command);
   console.info(result.stdout);
 }
 
-export default async function setup() {
+export default async function setup({ provide }: TestProject) {
   console.info('Database setup...');
 
   if (!process.env.DATABASE_IMAGE) throw Error('"DATABASE_IMAGE" environment variable is not set');
 
-  const container = await new PostgreSqlContainer(process.env.DATABASE_IMAGE)
-    .withDatabase(String(process.env.DATABASE_NAME))
-    .withUsername(String(process.env.DATABASE_USER))
-    .withPassword(String(process.env.DATABASE_PASSWORD))
-    .withExposedPorts({
-      container: Number(process.env.DATABASE_PORT),
-      host: Number(process.env.DATABASE_PORT),
-    })
-    .start();
+  const DATABASE_PORT = 5432;
+  const DATABASE_IMAGE = process.env.DATABASE_IMAGE;
+
+  const container = await new PostgreSqlContainer(DATABASE_IMAGE).withExposedPorts(DATABASE_PORT).start();
 
   console.info('Database container started');
 
+  const url = container.getConnectionUri();
+
+  provide('DATABASE_URL', url);
+
   console.info('Run migrations...');
 
-  await runMigrations();
+  await runMigrations(url);
 
   return async function teardown() {
     console.info('Database teardown...');

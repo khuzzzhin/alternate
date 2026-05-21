@@ -1,6 +1,10 @@
 import type { Object as BaseObject, Collection, Prisma, Resource } from '@prisma/client';
 import type { createExtendedPrismaClient } from './utils.js';
 
+export interface DatabaseOptions {
+  url: string;
+}
+
 export type PrismaClientExtended = ReturnType<typeof createExtendedPrismaClient>;
 
 export type { Collection, Resource };

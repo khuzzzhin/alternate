@@ -19,6 +19,7 @@ export const test = testBase.extend<Fixtures>({
   server: async ({}, use) => {
     if (!server) {
       server = buildServer({
+        databaseOptions: { url: inject('DATABASE_URL') },
         minioOptions: {
           host: inject('MINIO_HOST'),
           port: inject('MINIO_PORT'),
