@@ -3,6 +3,7 @@ import Fastify, { type FastifyServerOptions } from 'fastify';
 import { authentication } from './authentication/index.js';
 import { collection } from './collection/index.js';
 import { type DatabaseOptions, database } from './database/index.js';
+import { graph } from './graph/index.js';
 import { minio } from './minio/index.js';
 import { project } from './project/index.js';
 import { resource } from './resource/index.js';
@@ -42,6 +43,7 @@ export const buildServer = (options: Options) => {
   fastifyServer.register(collection);
   fastifyServer.register(resource);
   fastifyServer.register(storage);
+  fastifyServer.register(graph);
 
   return fastifyServer;
 };
